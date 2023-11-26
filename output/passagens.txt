@@ -1,3 +1,5 @@
 32;TRE;GRN;Manaus;Espirito Santo;12/05/2023;12/09/15h30;15h30;0.00
 192;FDS;VCS;Macapa;Roraima;19/05/2023;16h30;20h00;0.00
 34;DFH;VND;osdufhja;eruqw;16052003;12h30;23h31;437.50
+43;REB;CWB;Curitiba;Rio de Janeiro;12/05/2023;14h30;17h20;548.00
+46;BHB;VCB;Belo Horizonte;Joao Pessoa;16/02/2024;12h50;16h00;1560.00
