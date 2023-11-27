@@ -1,0 +1,9 @@
+30;BVC;NJD;Rio de Janeiro;Belo Horizonte;12/02/2023;15h20;16h30;350.00
+32;ERB;EWR;JDSAOIFJSAD;OFHDJH;17/09/2023;21h30;20h39;3478.00
+32;ber;eru;rio;bh;15/12336/8;12:30;12:35;543.00
+54;wef;wer;rio;bh;15-03-2023;15h30;15:30;3245.00
+324;reg;yte;weqr;wert;15-03-2023;15:30;23:20;324.00
+54;vtg;jnm;ibvutf;jvjghv;15/02/2023;12h30;17h30;543.00
+23;grw;tre;fgwfg;qeqw;15/02/2023;15:30;17:30;548.00
+43;ers;erw;haiusdh;ruehu;19/03/2024;19h30;21h50;6578.00
+286;ert;eww;bgmrjwe;jthwreu;19/03/2024;12:30;18:40;1327.00

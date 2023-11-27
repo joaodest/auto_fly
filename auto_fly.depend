@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1701119524 source:c:\users\joaod\source\repos\auto_fly\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"datetime_utils.h"
+
+1701123257 source:c:\users\joaod\source\repos\auto_fly\datetime_utils.c
+	"datetime_utils.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+
+1701117035 c:\users\joaod\source\repos\auto_fly\datetime_utils.h
+
