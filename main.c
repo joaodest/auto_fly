@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
-#include "datetime_utils.h"
+#include "helpers.h"
 
 #define MAX_DATE_LENGTH 11
 
@@ -18,6 +19,16 @@ typedef struct Passagem
     char horaChegada[6];
     float valor;
 } Passagem;
+
+void seedRandom()
+{
+    srand(time(NULL));
+}
+
+int generateRandomId()
+{
+    return rand() % 90 + 1000;
+}
 
 void label()
 {
@@ -62,17 +73,36 @@ int menu()
 }
 Passagem *createPassage()
 {
+    seedRandom();
+
     Passagem *passagem;
     passagem = (Passagem *)malloc(sizeof(Passagem));
 
-    printf("Entre com o ID da passagem: \n");
-    scanf("%d", &passagem->id);
+    passagem->id = generateRandomId();
 
     printf("Entre com o codigo do aeroporto de origem: \n");
     scanf(" %[^\n]", passagem->codigoOrigem);
 
+    char formattedAirportOrigin[AIRPORT_CODE_LENGTH];
+    if (!validateAirportCode(passagem->codigoOrigem, formattedAirportOrigin))
+    {
+        free(passagem);
+        return NULL;
+    }
+
+    strcpy(passagem->codigoOrigem, formattedAirportOrigin);
+
     printf("Entre com o codigo do aeroporto de destino: \n");
     scanf(" %[^\n]", passagem->codigoDestino);
+
+    char formattedAirportDest[AIRPORT_CODE_LENGTH];
+    if (!validateAirportCode(passagem->codigoDestino, formattedAirportDest))
+    {
+        free(passagem);
+        return NULL;
+    }
+
+    strcpy(passagem->codigoDestino, formattedAirportDest);
 
     printf("Entre com a cidade de origem: \n");
     scanf(" %[^\n]", passagem->cidadeOrigem);
@@ -165,7 +195,9 @@ void printAllPassages(int *pcount)
                passage.horaChegada,
                passage.horaPartida,
                &passage.valor);
-        printf("[Passagem] ID: %d | Codigo do aeroporto (origem/destino): %s / %s | Cidade (origem/destino): %s / %s | Data: %s | Hora (chegada/partida): %s / %s | Valor pago: %.2f\n",
+
+        printf("--------------------------------------------------------------------\n");
+        printf("[Passagem] \nID: %d \n Codigo do aeroporto (origem/destino): %s / %s \n Cidade (origem/destino): %s / %s \n Data: %s \n Hora (chegada/partida): %s / %s \n Valor pago: %.2f\n",
                passage.id,
                passage.codigoOrigem,
                passage.codigoDestino,
@@ -177,13 +209,14 @@ void printAllPassages(int *pcount)
                passage.valor);
         (*pcount)++;
     }
+    printf("--------------------------------------------------------------------\n");
 
     fclose(file);
 }
 
 void printPassagem(Passagem *passage)
 {
-    printf("[Passagem] ID: %d | Codigo do aeroporto (origem/destino): %s / %s | Cidade (origem/destino): %s / %s | Data: %s | Hora (chegada/partida): %s / %s | Valor pago: %.2f\n",
+    printf("[Passagem] \nID: %d \n Codigo do aeroporto (origem/destino): %s / %s \n Cidade (origem/destino): %s / %s \n Data: %s \n Hora (chegada/partida): %s / %s \n Valor pago: %.2f\n",
            passage->id,
            passage->codigoOrigem,
            passage->codigoDestino,
@@ -193,7 +226,9 @@ void printPassagem(Passagem *passage)
            passage->horaChegada,
            passage->horaPartida,
            passage->valor);
+    printf("--------------------------------------------------------------------\n");
 }
+
 Passagem *findById(int id)
 {
     FILE *file = fopen("passagens.txt", "r");
@@ -237,11 +272,95 @@ Passagem *findById(int id)
 
     return NULL;
 }
+
+void findByCode(const char *code)
+{
+    FILE *file = fopen("passagens.txt", "r");
+    if(file == NULL)
+    {
+        printf("Erro ao abrir arquivo \n");
+        return NULL;
+    }
+
+    int found = 0;
+
+    char *upperCode = malloc(AIRPORT_CODE_LENGTH * sizeof(char));
+
+    for(int i = 0; i < 4; i++)
+    {
+        upperCode[i] = toupper(code[i]);
+    }
+
+    Passagem passagem;
+
+    while(fscanf(file, "%d;%3s;%3s;%49[^;];%49[^;];%10[^;];%5[^;];%5[^;];%f\n",
+                 &passagem.id,
+                 passagem.codigoOrigem,
+                 passagem.codigoDestino,
+                 passagem.cidadeOrigem,
+                 passagem.cidadeDestino,
+                 passagem.data,
+                 passagem.horaChegada,
+                 passagem.horaPartida,
+                 &passagem.valor) == 9)
+    {
+        if (strcmp(passagem.codigoOrigem, upperCode) == 0 || strcmp(passagem.codigoDestino, upperCode) == 0)
+        {
+            printPassagem(&passagem);
+            found = 1;
+        }
+    }
+    if(!found)
+    {
+        printf("Nenhuma passagem com o codigo de aeroporto fornecido \n");
+    }
+    fclose(file);
+}
+void findByCity(const char *city)
+{
+    FILE *file = fopen("passagens.txt", "r");
+    if(file == NULL)
+    {
+        printf("Erro ao abrir arquivo \n");
+        return NULL;
+    }
+
+    int found = 0;
+
+    char *upperCity = malloc(MAX_CITY_LENGTH + 1* sizeof(char));
+
+
+    Passagem passagem;
+
+    while(fscanf(file, "%d;%3s;%3s;%49[^;];%49[^;];%10[^;];%5[^;];%5[^;];%f\n",
+                 &passagem.id,
+                 passagem.codigoOrigem,
+                 passagem.codigoDestino,
+                 passagem.cidadeOrigem,
+                 passagem.cidadeDestino,
+                 passagem.data,
+                 passagem.horaChegada,
+                 passagem.horaPartida,
+                 &passagem.valor) == 9)
+    {
+        if (strcmp(passagem.cidadeOrigem, upperCity) == 0 || strcmp(passagem.cidadeDestino, upperCity) == 0)
+        {
+            printPassagem(&passagem);
+            found = 1;
+        }
+    }
+    free(upperCity);
+    fclose(file);
+}
+
 void submenuOperations(int id)
 {
     switch (id)
     {
         int idPassagem;
+        char airportCode[AIRPORT_CODE_LENGTH];
+        char cityname[MAX_CITY_LENGTH];
+
     case 1:
 
         printf("\nDigite o ID da passagem que deseja buscar:\n> ");
@@ -260,13 +379,24 @@ void submenuOperations(int id)
         }
         break;
     case 2:
-        printf("usecase 2\n");
+        printf("Digite o codigo do aeroporto de origem para buscar por passagens:\n> ");
+        scanf("%3s", airportCode);
+
+        findByCode(airportCode);
+
         break;
     case 3:
-        printf("usecase 3\n");
+        printf("Digite o codigo do aeroporto de destino para buscar por passagens:\n> ");
+        scanf("%3s", airportCode);
+
+        findByCode(airportCode);
+
         break;
     case 4:
-        printf("usecase 4\n");
+        printf("Digite o codigo do aeroporto de destino para buscar por passagens:\n> ");
+        scanf(" %49s", cityname);
+
+        findByCity(cityname);
         break;
     case 5:
         printf("usecase 5\n");
