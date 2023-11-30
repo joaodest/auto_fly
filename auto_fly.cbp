@@ -31,10 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="datetime_utils.c">
+		<Unit filename="helpers.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="datetime_utils.h" />
+		<Unit filename="helpers.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
