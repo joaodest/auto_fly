@@ -1,8 +1,6 @@
 34;fsd;rtw;gfsdg;sdfgsdf;19/03/2023;19h40;19h45;1750.00
-1041;gre;trr;gfddfw;twerbv;15/09/2023;15h40;19h30;1540.00
-1041;FEI;BGH;Belo Horizonte;Muriae;17/03/2023;19h37;20h36;1650.00
 1027;GRE;GFI;Rio de Janeiro;Nova Friburgo;19/03/2024;18h30;20h00;759.99
 1063;IRE;ire;Mariana;Ouro Preto;18/03/2023;17h30;19h40;1750.00
 1038;BGH;QWE;Castelos;Brumadinho;19/09/2025;18h39;19h48;1750.00
 1075;BGU;HUW;Boa Vista;Nova Friburgo;19/08/2023;17h30;19h40;1520.00
-1067;HUW;IRE;Belo Horizonte;Rio de Janeiro;18/09/2023;17h39;20h30;1650.00
+1075;GFI;GRE;Campinas;Belo Hozizonte;18/09/2023;17h40;19h40;1750.00

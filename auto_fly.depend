@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1701297002 source:c:\users\joaod\source\repos\auto_fly\main.c
+1701723292 source:c:\users\joaod\source\repos\auto_fly\main.c
 	<stdio.h>
 	<string.h>
 	<stdlib.h>

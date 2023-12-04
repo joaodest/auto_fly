@@ -59,13 +59,13 @@ int menu()
     printf("2- Pesquisar passagens\n");
     printf("3- Cadastrar uma passagem\n");
     printf("4- Editar uma passagem\n");
+    printf("5- Deletar uma passagem\n");
     printf("0- Sair do programa\n");
     printf("--------------------------------------------------------------------\n");
     scanf("%d", &option);
 
-    if (option < 0 || option > 4)
+    if (option < 0 || option > 5)
     {
-        printf("Opcao invalida. Por favor, tente novamente.\n");
         return -1;
     }
     else
@@ -197,7 +197,7 @@ void printAllPassages(int *pcount)
                &passage.valor);
 
         printf("--------------------------------------------------------------------\n");
-        printf("[Passagem] \nID: %d \n Codigo do aeroporto (origem/destino): %s / %s \n Cidade (origem/destino): %s / %s \n Data: %s \n Hora (chegada/partida): %s / %s \n Valor pago: %.2f\n",
+        printf("[Passagem] \nID: %d \n Codigo do aeroporto (origem/destino): %s / %s \n Cidade (origem/destino): %s / %s \n Data: %s \n Hora (chegada/partida): %s / %s \n Valor pago: R$ %.2f\n",
                passage.id,
                passage.codigoOrigem,
                passage.codigoDestino,
@@ -327,10 +327,17 @@ void findByCity(const char *city)
 
     int found = 0;
 
-    char *upperCity = malloc(MAX_CITY_LENGTH + 1* sizeof(char));
+    char upperCity[MAX_CITY_LENGTH + 1];
 
+    for(int i = 0; i < strlen(city); i++)
+    {
+        upperCity[i] = toupper(city[i]);
+    }
+
+    upperCity[strlen(city)] = '\0';
 
     Passagem passagem;
+
 
     while(fscanf(file, "%d;%3s;%3s;%49[^;];%49[^;];%10[^;];%5[^;];%5[^;];%f\n",
                  &passagem.id,
@@ -343,15 +350,128 @@ void findByCity(const char *city)
                  passagem.horaPartida,
                  &passagem.valor) == 9)
     {
-        if (strcmp(passagem.cidadeOrigem, upperCity) == 0 || strcmp(passagem.cidadeDestino, upperCity) == 0)
+        if (strcasecmp(passagem.cidadeOrigem, upperCity) == 0 || strcasecmp(passagem.cidadeDestino, upperCity) == 0)
         {
             printPassagem(&passagem);
             found = 1;
         }
     }
-    free(upperCity);
+
+    fclose(file);
+
+    if(!found)
+    {
+        printf("Nenhuma passagem encontrada com o nome da cidade fornecida. \n");
+    }
+}
+Passagem* editPassage(int id)
+{
+    FILE *file  = fopen("passagens.txt", "r+");
+
+    if (file == NULL)
+    {
+        printf("Erro ao abrir arquivo\n");
+        return;
+    }
+    Passagem passagem;
+
+    int found = 0;
+
+    while(fscanf(file, "%d;%3s;%3s;%49[^;];%49[^;];%10[^;];%5[^;];%5[^;];%f\n",
+                 &passagem.id,
+                 passagem.codigoOrigem,
+                 passagem.codigoDestino,
+                 passagem.cidadeOrigem,
+                 passagem.cidadeDestino,
+                 passagem.data,
+                 passagem.horaChegada,
+                 passagem.horaPartida,
+                 &passagem.valor) == 9)
+    {
+        if(passagem.id == id)
+        {
+            found = 1;
+            createPassage();
+            fseek(file, -ftell(file), SEEK_CUR);
+
+
+            printf("--------------------------------------------------------------------\n");
+            printf("Passagem editada com sucesso! \n");
+            printf("--------------------------------------------------------------------\n");
+            printf("Informacoes atualizadas da passagem: \n");
+            printPassagem(&passagem);
+            break;
+        }
+    }
+    if(!found)
+    {
+        printf("--------------------------------------------------------------------\n");
+        printf("Nenhuma passagem encontrada com o ID fornecido. \n");
+        printf("--------------------------------------------------------------------\n");
+    }
+
     fclose(file);
 }
+void deletePassage(int id)
+{
+    FILE *inputFile = fopen("passagens.txt", "r");
+    FILE *tempFile = fopen("temp.txt", "w");
+
+    if (inputFile == NULL || tempFile == NULL)
+    {
+        printf("Erro ao abrir arquivo\n");
+        return;
+    }
+
+    Passagem passagem;
+    int found = 0;
+
+    while (fscanf(inputFile, "%d;%3s;%3s;%49[^;];%49[^;];%10[^;];%5[^;];%5[^;];%f\n",
+                  &passagem.id,
+                  passagem.codigoOrigem,
+                  passagem.codigoDestino,
+                  passagem.cidadeOrigem,
+                  passagem.cidadeDestino,
+                  passagem.data,
+                  passagem.horaChegada,
+                  passagem.horaPartida,
+                  &passagem.valor) == 9)
+    {
+        if (passagem.id == id)
+        {
+            found = 1;
+        }
+        else
+        {
+            fprintf(tempFile, "%d;%s;%s;%s;%s;%s;%s;%s;%.2f\n",
+                    passagem.id,
+                    passagem.codigoOrigem,
+                    passagem.codigoDestino,
+                    passagem.cidadeOrigem,
+                    passagem.cidadeDestino,
+                    passagem.data,
+                    passagem.horaChegada,
+                    passagem.horaPartida,
+                    passagem.valor);
+        }
+    }
+
+    fclose(inputFile);
+    fclose(tempFile);
+
+    remove("passagens.txt");
+    rename("temp.txt", "passagens.txt");
+
+    if (found)
+    {
+        printf("Passagem removida com sucesso! \n");
+    }
+    else
+    {
+        printf("Nenhuma passagem encontrada com o ID fornecido.\n");
+    }
+}
+
 
 void submenuOperations(int id)
 {
@@ -393,13 +513,16 @@ void submenuOperations(int id)
 
         break;
     case 4:
-        printf("Digite o codigo do aeroporto de destino para buscar por passagens:\n> ");
+        printf("Digite o nome da cidade de destino para buscar por passagens:\n> ");
         scanf(" %49s", cityname);
 
         findByCity(cityname);
         break;
     case 5:
-        printf("usecase 5\n");
+        printf("Digite o nome da cidade de origem para buscar por passagens:\n> ");
+        scanf(" %49s", cityname);
+
+        findByCity(cityname);
         break;
     }
 }
@@ -423,14 +546,14 @@ void submenu()
 int main()
 {
     // dd/MM/yyyy
-
+    int id;
     int option;
     option = menu();
 
     while (option != 0)
     {
         if (option == -1)
-            printf("Opcao Invalida! Tente novamente: \n");
+            printf("Opcao Invalida! Tente novamente. \n");
 
         if (option == 1)
         {
@@ -456,6 +579,21 @@ int main()
 
             free(newPassage);
         }
+        if(option == 4)
+        {
+            printf("Digite o identificador da passagem que deseja editar: \n> ");
+            scanf("%d", &id);
+
+            editPassage(id);
+
+        }
+        if(option == 5)
+        {
+            printf("Digite o identificador da passagem que deseja deletar: \n> ");
+            scanf("%d", &id);
+
+            deletePassage(id);
+        }
 
         char continuar;
         printf("Deseja realizar mais alguma tarefa?(s/n) \n");
@@ -473,7 +611,7 @@ int main()
             printf("Opcao invalida!\n");
         }
     }
-    printf("Obrigado por escolher a Auto-Fly, ate logo! :)");
+    printf("Obrigado(a) por escolher a Auto-Fly, ate logo! :)");
 
     return 0;
 }
